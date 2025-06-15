@@ -1,11 +1,41 @@
 import { useEffect, useRef, useState } from 'react';
 
+// Custom scrollbar styles
+const scrollbarStyles = `
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    margin-right: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+    margin-right: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    margin-right: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  .custom-scrollbar {
+    padding-right: 10px;
+  }
+`;
+
 function App() {
   const [prompt, setPrompt] = useState('');
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const chatEndRef = useRef(null);
   const typingRef = useRef(null);
+
+  // Add welcome message on first load
+  useEffect(() => {
+    if (messages.length === 0) {
+      setMessages([{ role: 'assistant', content: 'Hi! Ask me anything...', timestamp: new Date() }]);
+    }
+  }, []);
 
   const handleSubmit = async () => {
     if (!prompt.trim()) return;
@@ -15,20 +45,17 @@ function App() {
     setMessages(newMessages);
     setPrompt('');
 
-    // Debug: Check if API key is loaded
     const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
     console.log('API Key exists:', apiKey ? 'Yes' : 'No');
     console.log('API Key length:', apiKey ? apiKey.length : 0);
 
     try {
-      console.log('Sending request to OpenRouter...', { messages: newMessages });
-      
       const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-          'HTTP-Referer': window.location.origin,
+          'Authorization': `Bearer ${apiKey.trim()}`,
+          'HTTP-Referer': window.location.origin || 'http://localhost:5173',
           'X-Title': 'GPT Assistant',
         },
         body: JSON.stringify({
@@ -37,17 +64,12 @@ function App() {
         }),
       });
 
-      console.log('Response status:', res.status);
-      
       if (!res.ok) {
         const errorText = await res.text();
-        console.error('API Error:', res.status, errorText);
         throw new Error(`API Error: ${res.status} - ${errorText}`);
       }
 
       const data = await res.json();
-      console.log('API Response:', data);
-      
       const fullResponse = data.choices?.[0]?.message?.content || 'No response received.';
 
       let i = 0;
@@ -55,18 +77,20 @@ function App() {
       const animatedMessages = [...newMessages, { role: 'assistant', content: '', timestamp: new Date() }];
       setMessages(animatedMessages);
 
-      typingRef.current = setInterval(() => {
+      const typingInterval = setInterval(() => {
         if (i < fullResponse.length) {
           currentText += fullResponse.charAt(i);
           animatedMessages[animatedMessages.length - 1].content = currentText;
           setMessages([...animatedMessages]);
           i++;
         } else {
-          clearInterval(typingRef.current);
+          clearInterval(typingInterval);
           typingRef.current = null;
           setLoading(false);
         }
       }, 20);
+      
+      typingRef.current = typingInterval;
     } catch (err) {
       console.error('Error occurred:', err);
       setMessages([...newMessages, { role: 'assistant', content: `Error: ${err.message}`, timestamp: new Date() }]);
@@ -96,34 +120,39 @@ function App() {
   }, [messages]);
 
   return (
-     
-      <div className="min-h-screen bg-gradient-to-tr from-slate-800 to-slate-900 flex items-center justify-center px-4 py-8">
+    <>
+      <style>{scrollbarStyles}</style>
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-2xl p-0.5 rounded-2xl bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 shadow-xl">
           <div className="bg-black rounded-2xl p-4 md:p-6 flex flex-col h-[80vh]">
             <h1 className="text-3xl font-extrabold text-white mb-4 text-center">GPT Assistant</h1>
 
             {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto custom-scrollbar">
-              {messages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mt-4`}
-                >
+              {messages.length === 0 ? (
+                <div className="text-center text-gray-400">No messages yet...</div>
+              ) : (
+                messages.map((msg, index) => (
                   <div
-                    className={`min-w-24 px-4 py-3 break-words w-fit max-w-[80%] shadow-md rounded-2xl ${
-                      msg.role === 'user'
-                        ? 'bg-gradient-to-br from-purple-600 to-indigo-600 text-white rounded-br-none'
-                        : 'bg-gray-700 text-white rounded-bl-none'
-                    }`}
+                    key={index}
+                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mt-4`}
                   >
-                    <p className="text-sm whitespace-pre-line">{msg.content}</p>
-                    <p className="text-xs text-gray-300 mt-1">{formatTime(msg.timestamp)}</p>
-                    {loading && msg.role === 'assistant' && index === messages.length - 1 && (
-                      <span className="text-white text-xs animate-pulse">Typing...</span>
-                    )}
+                    <div
+                      className={`min-w-24 px-4 py-3 break-words w-fit max-w-[80%] shadow-md rounded-2xl ${
+                        msg.role === 'user'
+                          ? 'bg-gradient-to-br from-purple-600 to-indigo-600 text-white rounded-br-none'
+                          : 'bg-gray-700 text-white rounded-bl-none'
+                      }`}
+                    >
+                      <p className="text-sm whitespace-pre-line">{msg.content}</p>
+                      <p className="text-xs text-gray-300 mt-1">{formatTime(msg.timestamp)}</p>
+                      {loading && msg.role === 'assistant' && index === messages.length - 1 && (
+                        <span className="text-white text-xs animate-pulse">Typing...</span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
               <div ref={chatEndRef} />
             </div>
 
@@ -157,7 +186,7 @@ function App() {
                     onClick={handleSubmit}
                     className="absolute bottom-3 right-3 p-2 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-full hover:scale-105 transition-transform disabled:opacity-50"
                     title="Send"
-                    disabled={!prompt.trim()}
+                    disabled={!prompt.trim() || loading}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -175,6 +204,7 @@ function App() {
           </div>
         </div>
       </div>
+    </>
   );
 }
 
