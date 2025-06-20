@@ -1,12 +1,58 @@
-# React + Vite
+# 🧠 GPT Assistant – A ChatGPT Clone
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An elegant and functional frontend clone of ChatGPT, built using **React**, **Vite**, and **Tailwind CSS**. Designed to replicate the feel of modern AI chat apps like Aidy and ChatGPT, with dynamic UI, chat history, and smooth UX.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Live Demo
 
-## Expanding the ESLint configuration
+🌐 [Click here to try GPT Assistant](https://gpt-assistant-red.vercel.app)  
+*(Replace this with your actual deployment link — Vercel, Netlify, etc.)*
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 🛠️ Features
+
+- ✅ Chat UI inspired by ChatGPT
+- ✅ Typing animation for assistant responses
+- ✅ Scrollable message history with timestamps
+- ✅ Dark mode with animated gradient background
+- ✅ Responsive design with mobile support
+- ✅ Ready for OpenRouter or OpenAI integration
+
+---
+
+## 📸 Screenshot Preview
+
+<p align="center">
+  <img src="./public/image.png" width="700" alt="GPT Assistant Screenshot" />
+</p>
+
+---
+
+## ⚙️ Tech Stack
+
+| Tool            | Description                      |
+|-----------------|----------------------------------|
+| React           | UI library                       |
+| Vite            | Fast build tool                  |
+| Tailwind CSS    | Utility-first CSS framework      |
+| OpenRouter API  | (or OpenAI) for AI responses     |
+
+---
+
+## 📦 Installation & Setup
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/ShaunakMishra25/GPT-Assistant.git
+cd GPT-Assistant
+
+# 2. Install dependencies
+npm install
+
+# 3. Add your API key to a .env file
+echo "VITE_OPENROUTER_API_KEY=sk-xxxxxxxxxxxx" > .env
+
+# 4. Run the development server
+npm run dev
