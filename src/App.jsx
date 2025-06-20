@@ -46,6 +46,10 @@ function App() {
     setPrompt('');
 
     const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+if (!apiKey || !apiKey.trim()) {
+  throw new Error('Missing API Key. Please set VITE_OPENROUTER_API_KEY in .env file.');
+}
+
     console.log('API Key exists:', apiKey ? 'Yes' : 'No');
     console.log('API Key length:', apiKey ? apiKey.length : 0);
 
