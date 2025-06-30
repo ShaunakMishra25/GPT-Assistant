@@ -1,27 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-
-// Custom scrollbar styles
-const scrollbarStyles = `
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-    margin-right: 4px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-    margin-right: 4px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 3px;
-    margin-right: 4px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
-  }
-  .custom-scrollbar {
-    padding-right: 10px;
-  }
-`;
+import './App.css';
 
 function App() {
   const [prompt, setPrompt] = useState('');
@@ -29,6 +7,13 @@ function App() {
   const [loading, setLoading] = useState(false);
   const chatEndRef = useRef(null);
   const typingRef = useRef(null);
+
+  // Add welcome message on first load
+  useEffect(() => {
+    if (messages.length === 0) {
+      setMessages([{ role: 'assistant', content: 'Hi! Ask me anything...', timestamp: new Date() }]);
+    }
+  }, []);
 
   // Add welcome message on first load
   useEffect(() => {
@@ -63,7 +48,7 @@ if (!apiKey || !apiKey.trim()) {
           'X-Title': 'GPT Assistant',
         },
         body: JSON.stringify({
-          model: 'openai/gpt-3.5-turbo',
+          model: 'openai/gpt-3.5-turbo-0613',
           messages: newMessages.map(msg => ({ role: msg.role, content: msg.content })),
         }),
       });
@@ -125,60 +110,68 @@ if (!apiKey || !apiKey.trim()) {
 
   return (
     <>
-      <style>{scrollbarStyles}</style>
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-2xl p-0.5 rounded-2xl bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500 shadow-xl">
-          <div className="bg-black rounded-2xl p-4 md:p-6 flex flex-col h-[80vh]">
-            <h1 className="text-3xl font-extrabold text-white mb-4 text-center">GPT Assistant</h1>
+
+      <div className="min-h-screen bg-gradient-to-br from-purple-900/90 via-blue-900/90 to-indigo-900/90 flex items-center justify-center px-4 py-8 backdrop-blur-lg">
+        <div className="w-full max-w-2xl p-0.5 rounded-2xl bg-gradient-to-tr from-blue-500/90 via-purple-500/90 to-pink-500/90 shadow-xl shadow-blue-500/50 ring-1 ring-blue-500/20">
+          <div className="bg-black rounded-2xl p-4 md:p-6 flex flex-col h-[80vh] border border-blue-500/20">
+            <h1 className="text-5xl font-bold text-white mb-8 text-center bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300 animate-gradient-text">GPT Assistant</h1>
 
             {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar">
-              {messages.length === 0 ? (
-                <div className="text-center text-gray-400">No messages yet...</div>
-              ) : (
-                messages.map((msg, index) => (
+            <div className="flex-1 overflow-y-auto custom-scrollbar relative">
+              {messages.map((msg, index) => (
+                <div
+                  key={index}
+                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mt-4 transition-all duration-300`}
+                >
                   <div
-                    key={index}
-                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} mt-4`}
+                    className={`min-w-24 px-6 py-4 break-words w-fit max-w-[80%] shadow-lg rounded-2xl ${
+                      msg.role === 'user'
+                        ? 'bg-gradient-to-br from-purple-600/90 to-indigo-600/90 text-white rounded-br-none hover:scale-102 transition-all duration-300 hover:shadow-2xl'
+                        : 'bg-gradient-to-br from-gray-700/90 to-gray-800/90 text-white rounded-bl-none hover:scale-102 transition-all duration-300 hover:shadow-2xl'
+                    }`}
                   >
-                    <div
-                      className={`min-w-24 px-4 py-3 break-words w-fit max-w-[80%] shadow-md rounded-2xl ${
-                        msg.role === 'user'
-                          ? 'bg-gradient-to-br from-purple-600 to-indigo-600 text-white rounded-br-none'
-                          : 'bg-gray-700 text-white rounded-bl-none'
-                      }`}
-                    >
-                      <p className="text-sm whitespace-pre-line">{msg.content}</p>
-                      <p className="text-xs text-gray-300 mt-1">{formatTime(msg.timestamp)}</p>
-                      {loading && msg.role === 'assistant' && index === messages.length - 1 && (
-                        <span className="text-white text-xs animate-pulse">Typing...</span>
-                      )}
-                    </div>
+                    <p className="text-sm whitespace-pre-line">{msg.content}</p>
+                    <p className="text-xs text-gray-300 mt-1">{formatTime(msg.timestamp)}</p>
+                    {loading && msg.role === 'assistant' && index === messages.length - 1 && (
+                      <span className="text-white text-xs animate-pulse">Typing...</span>
+                    )}
                   </div>
-                ))
+                </div>
+              ))}
+              <div ref={chatEndRef} className="h-8" />
+              {loading && (
+                <div className="flex justify-center mt-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
+                </div>
               )}
-              <div ref={chatEndRef} />
             </div>
 
             {/* Input Area */}
             <div className="mt-4">
               <div className="relative w-full">
-                <textarea
-                  className="w-full h-24 p-4 pr-12 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none text-base text-white placeholder-gray-400 bg-gray-800 custom-scrollbar"
-                  placeholder="Type your question or prompt..."
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSubmit();
-                    }
-                  }}
-                />
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                    <div className="input-icon">
+                      <div className="input-icon::before"></div>
+                    </div>
+                  </div>
+                  <textarea
+                    className="w-full h-24 pl-10 pr-12 border border-gray-600 rounded-xl pt-5 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none text-base text-white placeholder-[#60a5fa] bg-gray-800 custom-scrollbar transition-all duration-300 hover:border-blue-400 focus:border-blue-400 focus:ring-2"
+                    placeholder="Type your question or prompt..."
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSubmit();
+                      }
+                    }}
+                  />
+                </div>
                 {loading ? (
                   <button
                     onClick={stopTyping}
-                    className="absolute bottom-3 right-3 p-2 bg-red-600 text-white rounded-full hover:scale-105 transition-transform"
+                    className="absolute bottom-3 right-3 p-2.5 bg-red-600 text-white rounded-full hover:scale-105 transition-all duration-300 hover:bg-red-500 hover:shadow-lg"
                     title="Stop Generating"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -188,7 +181,7 @@ if (!apiKey || !apiKey.trim()) {
                 ) : (
                   <button
                     onClick={handleSubmit}
-                    className="absolute bottom-3 right-3 p-2 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-full hover:scale-105 transition-transform disabled:opacity-50"
+                    className="absolute bottom-3 right-3 p-2.5 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-full hover:scale-105 transition-all duration-300 hover:from-blue-400 hover:to-purple-500 hover:shadow-lg disabled:opacity-50"
                     title="Send"
                     disabled={!prompt.trim() || loading}
                   >

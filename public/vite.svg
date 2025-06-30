@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<img src="/vite.svg" alt="Logo" width={32} height={32} />
+=======
+>>>>>>> 5828fc2 (� Updated vite.svg and other assets)
 
 <!-- Generator: visioncortex VTracer 0.6.4 -->
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" preserveAspectRatio="xMidYMid meet">
@@ -289,4 +295,9 @@
 <path d="M0 0 C0 2.333 0 4.667 0 7 C-0.99 6.67 -1.98 6.34 -3 6 C-2.625 3.562 -2.625 3.562 -2 1 C-1.34 0.67 -0.68 0.34 0 0 Z " fill="#40A58D" transform="translate(513,336)"/>
 <path d="M0 0 C2.97 0.495 2.97 0.495 6 1 C6 1.66 6 2.32 6 3 C6.66 3.33 7.32 3.66 8 4 C5.125 3.688 5.125 3.688 2 3 C1.34 2.01 0.68 1.02 0 0 Z " fill="#D2F4ED" transform="translate(503,323)"/>
 <path d="M0 0 C0.99 0.33 1.98 0.66 3 1 C1.074 3.439 -0.801 5.801 -3 8 C-2.744 5.657 -2.407 3.322 -2 1 C-1.34 0.67 -0.68 0.34 0 0 Z " fill="#D4F5EC" transform="translate(595,315)"/>
+<<<<<<< HEAD
 </svg>
+=======
+</svg>
+>>>>>>> 6d6aa5b (Update: Added Favicon of Website)
+>>>>>>> 5828fc2 (� Updated vite.svg and other assets)
